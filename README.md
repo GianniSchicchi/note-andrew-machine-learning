@@ -21,7 +21,7 @@
 
 ### 技能樹
 
-![Syntax highlighting example](http://d.pr/i/9HM6+)
+![Syntax highlighting example](https://github.com/htaiwan/note-andrew-machine-learning/blob/master/%E6%8A%80%E8%83%BD%E6%A8%B9/1.png)
 
 ## Week 2 Linear Regression with Multiple Variables
 ### 大綱
@@ -36,6 +36,7 @@
 * **normal equation和gradient descent的比較**
 
 ### 技能樹
+![Syntax highlighting example](https://github.com/htaiwan/note-andrew-machine-learning/blob/master/%E6%8A%80%E8%83%BD%E6%A8%B9/2.png)
 
 ## Week 3 Logistic Regression
 ### 大綱
@@ -54,6 +55,7 @@
 * **如何利用regularization來處理overfitting problem**
 
 ### 技能樹
+![Syntax highlighting example](https://github.com/htaiwan/note-andrew-machine-learning/blob/master/%E6%8A%80%E8%83%BD%E6%A8%B9/3.png)
 
 ## Week 4 Neural Networks: Representation
 ### 大綱
@@ -67,6 +69,7 @@
 * **了解forward propagate**
 
 ### 技能樹
+![Syntax highlighting example](https://github.com/htaiwan/note-andrew-machine-learning/blob/master/%E6%8A%80%E8%83%BD%E6%A8%B9/4%2C5.png)
 
 ## Week 5  Neural Networks: Learning
 這一週將要學到的是`backpropagation algorithm`，這個algorithm是我認為這系列課程中做複雜的，要如何從類神經的網路的ouput的誤差去反推校正每一個偏差值。需要懂得forward propagation和back-propagation在Neural Networks的算法，接下來如何用`Gradient Checking`去驗證backpropagation是否正確。
@@ -82,6 +85,7 @@
 * **如何決定一個適當的neural network architecture**
 
 ### 技能樹
+![Syntax highlighting example](https://github.com/htaiwan/note-andrew-machine-learning/blob/master/%E6%8A%80%E8%83%BD%E6%A8%B9/4%2C5.png)
 
 ## Week 6 Advice for Applying Machine Learning
 ### 大綱
@@ -97,6 +101,7 @@
 
 
 ### 技能樹
+![Syntax highlighting example](https://github.com/htaiwan/note-andrew-machine-learning/blob/master/%E6%8A%80%E8%83%BD%E6%A8%B9/6.png)
 
 ## Week 7 Support Vector Machines
 ### 大綱
@@ -110,6 +115,7 @@
 
 
 ### 技能樹
+![Syntax highlighting example](https://github.com/htaiwan/note-andrew-machine-learning/blob/master/%E6%8A%80%E8%83%BD%E6%A8%B9/7.png)
 
 ## Week 8 Unsupervised Learning
 ### 大綱
@@ -121,6 +127,7 @@
 * **如何將壓縮過的資料在反推(reconstruction)回原始資料(有失真的狀況)**
 
 ### 技能樹
+![Syntax highlighting example](https://github.com/htaiwan/note-andrew-machine-learning/blob/master/%E6%8A%80%E8%83%BD%E6%A8%B9/8.png)
 
 ## Week 9 Anomaly Detection ＆ Recommender Systems
 ### 大綱
@@ -135,6 +142,7 @@
 
 
 ### 技能樹
+![Syntax highlighting example](https://github.com/htaiwan/note-andrew-machine-learning/blob/master/%E6%8A%80%E8%83%BD%E6%A8%B9/9.png)
 
 ## Week 10 Large Scale Machine Learning
 ### 大綱
@@ -148,6 +156,7 @@
 * **什麼是Map Reduce and  Data Parallelism**
 
 ### 技能樹
+![Syntax highlighting example](https://github.com/htaiwan/note-andrew-machine-learning/blob/master/%E6%8A%80%E8%83%BD%E6%A8%B9/10.png)
 
 ## Week 11 application Example: Photo OCR
 ### 大綱
@@ -161,3 +170,4 @@
 
 
 ### 技能樹
+![Syntax highlighting example](https://github.com/htaiwan/note-andrew-machine-learning/blob/master/%E6%8A%80%E8%83%BD%E6%A8%B9/11.png)
