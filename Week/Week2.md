@@ -18,5 +18,14 @@
 * **polynomial regression的運用**
 * **normal equation和gradient descent的比較**
 
-### 技能樹
+### Concept Graph
 
+![1](https://github.com/htaiwan/note-andrew-machine-learning/blob/4db4a018b65f57a950315cf948240c194c93d893/Concept%20Graph/Week2/1.png)
+
+![2](https://github.com/htaiwan/note-andrew-machine-learning/blob/4db4a018b65f57a950315cf948240c194c93d893/Concept%20Graph/Week2/2.png) 
+
+![3](https://github.com/htaiwan/note-andrew-machine-learning/blob/4db4a018b65f57a950315cf948240c194c93d893/Concept%20Graph/Week2/3.png) 
+
+![4](https://github.com/htaiwan/note-andrew-machine-learning/blob/4db4a018b65f57a950315cf948240c194c93d893/Concept%20Graph/Week2/4.png) 
+
+![5](https://github.com/htaiwan/note-andrew-machine-learning/blob/4db4a018b65f57a950315cf948240c194c93d893/Concept%20Graph/Week2/5.png) 

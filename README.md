@@ -4,4 +4,5 @@
 
 ## [Week 1 Introduction](https://github.com/htaiwan/note-andrew-machine-learning/blob/master/Week/Week1.md)
 ## [Week 2 Linear Regression with Multiple Variables](https://github.com/htaiwan/note-andrew-machine-learning/blob/master/Week/Week2.md)
+## [Week 3 Logistic Regression](https://github.com/htaiwan/note-andrew-machine-learning/blob/master/Week/Week3.md)
 

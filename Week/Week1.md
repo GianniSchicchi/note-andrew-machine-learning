@@ -13,4 +13,15 @@
 * **了解regression跟classification的差異**
 * **了解Linear Regression with one variable中的hypothesis function和cost function和gradient descent彼此間的關係**
 
-### 技能樹
+### Concept Graph
+
+![1](https://github.com/htaiwan/note-andrew-machine-learning/blob/4db4a018b65f57a950315cf948240c194c93d893/Concept%20Graph/Week1/1.png)
+
+![2](https://github.com/htaiwan/note-andrew-machine-learning/blob/4db4a018b65f57a950315cf948240c194c93d893/Concept%20Graph/Week1/2.png) 
+
+![3](https://github.com/htaiwan/note-andrew-machine-learning/blob/4db4a018b65f57a950315cf948240c194c93d893/Concept%20Graph/Week1/3.png) 
+
+![4](https://github.com/htaiwan/note-andrew-machine-learning/blob/4db4a018b65f57a950315cf948240c194c93d893/Concept%20Graph/Week1/4.png) 
+
+![5](https://github.com/htaiwan/note-andrew-machine-learning/blob/4db4a018b65f57a950315cf948240c194c93d893/Concept%20Graph/Week1/5.png) 
+
