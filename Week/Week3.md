@@ -24,6 +24,136 @@
 * **怎樣利用二分法的原則進行多分類**
 * **了解regulation的含義，以及將個公式進行regularize**
 
+### 作業
+
+#### Logistic Regression
+
+* 資料初始化
+
+```octave
+data = load('ex2data1.txt');
+X = data(:, [1, 2]); 
+y = data(:, 3);
+
+[m, n] = size(X); %[100, 2]
+X = [ones(m, 1) X];  %[100, 3]
+initial_theta = zeros(n + 1, 1);  %[3, 1]
+```
+
+* 1. sigmoid function
+
+```octave
+function g = sigmoid(z)
+
+g = zeros(size(z));
+g = ones(size(z)) ./ (1.0 + exp(-z));
+
+```
+
+* 2. cost function and gradient
+
+```octave
+function [J, grad] = costFunction(theta, X, y)
+
+m = length(y);
+J = 0;
+grad = zeros(size(theta));
+
+% 計算hypothesis function
+h = sigmoid(X*theta);
+
+% 計算cost function
+J = (1/m)*sum(-y.*log(h)-(1-y).*log(1-h));
+
+% 計算gradient
+grad = (1/m)*(X'*(h-y));
+
+```
+
+* 3. Learning parameters using fminunc
+
+```octave
+%  Set options for fminunc
+options = optimset('GradObj', 'on', 'MaxIter', 400);
+
+%  Run fminunc to obtain the optimal theta
+%  This function will return theta and the cost 
+[theta, cost] = ...
+	fminunc(@(t)(costFunction(t, X, y)), initial_theta, options);
+
+```
+
+* 4. Evaluating logistic regression
+
+```octave
+function p = predict(theta, X)
+
+m = size(X, 1);
+p = zeros(m, 1);
+
+% set p to a vector of 0's and 1's
+p = round(sigmoid(X*theta));
+
+```
+
+#### Regularized Logistic Regression
+
+* 1. feature mapping
+
+```octave
+
+function out = mapFeature(X1, X2)
+
+% 產生更複雜hypothes function，讓我們有機會更佳fit feature
+%   Returns a new feature array with more features, comprising of 
+%   X1, X2, X1.^2, X2.^2, X1*X2, X1*X2.^2, etc..
+%
+%   Inputs X1, X2 must be the same size
+
+degree = 6;
+out = ones(size(X1(:,1)));
+for i = 1:degree
+    for j = 0:i
+        out(:, end+1) = (X1.^(i-j)).*(X2.^j);
+    end
+end
+
+```
+
+* 2. cost function and gradient
+
+```octave
+% lambda 是regularization parameter，用來控制overfitting or underfitting
+function [J, grad] = costFunctionReg(theta, X, y, lambda)
+
+[J, grad] = costFunction(theta, X, y);
+regularization_J = (lambda/(2*m)) * sum(theta(2:end).^2);
+J = J + regularization_J;
+
+regularization_grade = (lambda/m) * theta(2:end);
+grad(2:end) = grad(2:end) + regularization_grade;
+
+```
+
+* 3. Learning parameters using fminunc
+
+```octave
+% Initialize fitting parameters
+initial_theta = zeros(size(X, 2), 1);
+
+% Set regularization parameter lambda to 1 (you should vary this)
+lambda = 100;
+
+% Set Options
+options = optimset('GradObj', 'on', 'MaxIter', 400);
+
+% Optimize
+[theta, J, exit_flag] = ...
+	fminunc(@(t)(costFunctionReg(t, X, y, lambda)), initial_theta, options);
+
+```
+
+
 ### Concept Graph
 
 ![1](https://github.com/htaiwan/note-andrew-machine-learning/blob/4db4a018b65f57a950315cf948240c194c93d893/Concept%20Graph/Week3/1.png)
