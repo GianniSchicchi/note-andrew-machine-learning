@@ -35,6 +35,188 @@
 * **Unrolling，了解matrix的合併跟還原**
 * **如何進行Gradient Checking**
 * **如何將weight進行random Initialization**
+
+### 作業
+
+#### Neural Network
+
+* Model representation
+
+```octave
+
+input_layer_size  = 400;  % 20x20 Input Images of Digits
+hidden_layer_size = 25;   % 25 hidden units
+num_labels = 10;          % 10 labels, from 1 to 10   
+                          % (note that we have mapped "0" to label 10)
+                          
+load('ex4weights.mat');
+nn_params = [Theta1(:) ; Theta2(:)];
+
+% Weight regularization parameter (we set this to 0 here).
+lambda = 0;
+
+```
+
+* Feedforward and cost function
+
+```octave
+function [J grad] = nnCostFunction(nn_params, ...
+                                   input_layer_size, ...
+                                   hidden_layer_size, ...
+                                   num_labels, ...
+                                   X, y, lambda)
+
+% Reshape nn_params back into the parameters Theta1 and Theta2
+Theta1 = reshape(nn_params(1:hidden_layer_size * (input_layer_size + 1)), ...
+                 hidden_layer_size, (input_layer_size + 1));
+
+Theta2 = reshape(nn_params((1 + (hidden_layer_size * (input_layer_size + 1))):end), ...
+                 num_labels, (hidden_layer_size + 1));
+                 
+m = size(X, 1); % 5000 * 400
+J = 0;
+Theta1_grad = zeros(size(Theta1));
+Theta2_grad = zeros(size(Theta2));
+
+% mapping 0~9 to index [0,1,0...,0]
+% y = 5000 * 1 ---->> Y = 10 * 50000
+number_of_classes = length(unique(y));
+Y = zeros(number_of_classes, m);
+for i = 1:m
+    Y(y(i), i) = 1;
+endfor
+
+p = zeros(size(X, 1), 1); % 5000 * 1
+
+input_layer = [ones(1,m); X']; % 401 * 5000
+hidden_layer = [ones(1,m); sigmoid(Theta1 * input_layer)]; % 26 * 5000
+output_layer = sigmoid(Theta2 * hidden_layer);  % 10 * 5000
+                 
+% Do forward propagation
+input_layer = [ones(1,m); X']; % 401 * 5000
+hidden_layer = [ones(1,m); sigmoid(Theta1 * input_layer)]; % 26 * 5000
+output_layer = sigmoid(Theta2 * hidden_layer);  % 10 * 5000
+
+% A3 here is our h0
+h0 = output_layer;
+
+% Compute cost function
+J = (1/m)*sum(sum(-Y.*log(h0) - (1-Y).*log(1-h0)));
+             
+% Regularized cost function
+regualized_J = (lambda/(2*m))*sum(sum(Theta1(:, 2:end).^2)) + sum(sum(Theta2(:, 2:end).^2));
+
+J = J + regualized_J;
+
+```
+
+
+#### Backpropagation
+
+* Backpropagation
+
+```octave
+% 將產生最後的總誤差，根據theta的比例，分散各layer的node上
+delta_output_layer = output_layer - Y;
+delta_hidden_layer = (Theta2'*delta_output_layer)(2:end, :) .* hidden_layer;
+
+% 再利用這些誤差去調整theta，不斷重複這樣的動作，直到總誤差開始收斂為止
+Theta1_grad = (delta_2 * input_layer')/m;
+Theta2_grad = (delta_3 * hidden_layer')/m;
+
+% regularize
+Theta1_reg_grad = (lambda/m)*Theta1;
+Theta2_reg_grad = (lambda/m)*Theta2;
+
+Theta1_grad = Theta1_grad + Theta1_reg_grad;
+Theta2_grad = Theta2_grad + Theta2_reg_grad;
+
+% Unroll gradients
+grad = [Theta1_grad(:) ; Theta2_grad(:)];
+
+```
+
+* Sigmoid Gradient
+
+```octave
+function g = sigmoidGradient(z)
+
+g = zeros(size(z));
+g = sigmoid(z).*(1-sigmoid(z));
+
+```
+
+
+* Initializing Pameters
+
+```octave
+function W = randInitializeWeights(L_in, L_out)
+
+W = zeros(L_out, 1 + L_in);
+epsilon_init = 0.12;
+W = rand(L_out, 1 + L_in) * 2 * epsilon_init - epsilon_init;
+```
+
+* Check Gradients
+
+```octave
+% 利用Gradient Checking檢查Backpropgation是否正確
+function checkNNGradients(lambda)
+
+??
+
+```
+
+* Learning parameters using fmincg
+
+```octave
+% 隨機初始化weight
+initial_Theta1 = randInitializeWeights(input_layer_size, hidden_layer_size);
+initial_Theta2 = randInitializeWeights(hidden_layer_size, num_labels);
+initial_nn_params = [initial_Theta1(:) ; initial_Theta2(:)];
+
+% also try the MaxIter to a larger
+options = optimset('MaxIter', 50);
+
+% also try different values of lambda
+lambda = 1;
+
+% Create "short hand" for the cost function to be minimized
+costFunction = @(p) nnCostFunction(p, ...
+                                   input_layer_size, ...
+                                   hidden_layer_size, ...
+                                   num_labels, X, y, lambda);
+                                   
+% 將cost function帶入最佳化函數fmincg()，找出最佳的weight
+[nn_params, cost] = fmincg(costFunction, initial_nn_params, options);
+
+% Obtain Theta1 and Theta2 back from nn_params
+Theta1 = reshape(nn_params(1:hidden_layer_size * (input_layer_size + 1)), ...
+                 hidden_layer_size, (input_layer_size + 1));
+
+Theta2 = reshape(nn_params((1 + (hidden_layer_size * (input_layer_size + 1))):end), ...
+                 num_labels, (hidden_layer_size + 1));
+
+```
+
+* Implement Predict
+
+```octave
+function p = predict(Theta1, Theta2, X)
+
+m = size(X, 1);
+num_labels = size(Theta2, 1);
+
+p = zeros(size(X, 1), 1);
+
+h1 = sigmoid([ones(m, 1) X] * Theta1');
+h2 = sigmoid([ones(m, 1) h1] * Theta2');
+[dummy, p] = max(h2, [], 2);
+
+```
+
+#### Visualizing the hidden layer
+
   
 ### Concept Graph
 
