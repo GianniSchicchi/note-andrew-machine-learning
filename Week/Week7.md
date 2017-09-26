@@ -33,6 +33,130 @@
 * Kernel在SVM扮演的角色，cost function如何寫，有哪些參數會影響。
 * 根據feature，training set size，來決定要使用Logistic Regression或SVM(with/without kernel)。
 
+### 作業
+
+#### Support Vector Machines
+
+* Loading and Visualizing Data
+
+```octave
+% Load from ex6data1: 
+% You will have X, y in your environment
+load('ex6data1.mat');
+```
+
+* Training Linear SVM
+
+```octave
+% You should try to change the C value below and see how the decision
+% boundary varies (e.g., try C = 1000)
+C = 1;
+model = svmTrain(X, y, C, @linearKernel, 1e-3, 20);
+visualizeBoundaryLinear(X, y, model);
+```
+
+* Implementing Gaussian Kernel
+
+```octave
+x1 = [1 2 1]; x2 = [0 4 -1]; sigma = 2;
+sim = gaussianKernel(x1, x2, sigma);
+
+=================================
+
+% returns a radial basis function kernel between x1 and x2
+function sim = gaussianKernel(x1, x2, sigma)
+
+% Ensure that x1 and x2 are column vectors
+x1 = x1(:); x2 = x2(:);
+
+% You need to return the following variables correctly.
+sim = 0;
+
+sim = exp(- ((x1-x2)'*(x1-x2)) / (2*(sigma^2)) );
+```
+
+* Training SVM with RBF Kernel (Dataset 2)
+
+```octave
+% Load from ex6data2: 
+% You will have X, y in your environment
+load('ex6data2.mat');
+
+% SVM Parameters
+C = 1; sigma = 0.1;
+
+% We set the tolerance and max_passes lower here so that the code will run
+% faster. However, in practice, you will want to run the training to
+% convergence.
+model= svmTrain(X, y, C, @(x1, x2) gaussianKernel(x1, x2, sigma)); 
+visualizeBoundary(X, y, model);
+
+```
+
+#### Spam Classification with SVMs
+
+* Email Preprocessing
+
+```octave
+% Extract Features
+file_contents = readFile('emailSample1.txt');
+word_indices  = processEmail(file_contents);
+
+```
+
+* Feature Extraction
+
+```octave
+% Extract Features
+file_contents = readFile('emailSample1.txt');
+word_indices  = processEmail(file_contents);
+features      = emailFeatures(word_indices);
+
+=================================
+
+% takes in a word_indices vector and produces a feature vector from the word indices
+function x = emailFeatures(word_indices)
+
+% Total number of words in the dictionary
+n = 1899;
+
+% You need to return the following variables correctly.
+x = zeros(n, 1);
+
+for i = word_indices
+	x(i) = 1;
+end
+
+```
+
+* Train Linear SVM for Spam Classification
+
+```octave
+% Load the Spam Email dataset
+% You will have X, y in your environment
+load('spamTrain.mat');
+
+fprintf('\nTraining Linear SVM (Spam Classification)\n')
+fprintf('(this may take 1 to 2 minutes) ...\n')
+
+C = 0.1;
+model = svmTrain(X, y, C, @linearKernel);
+
+p = svmPredict(model, X);
+```
+
+* Test Spam Classification
+
+```octave
+% Load the test dataset
+% You will have Xtest, ytest in your environment
+load('spamTest.mat');
+
+fprintf('\nEvaluating the trained Linear SVM on a test set ...\n')
+
+p = svmPredict(model, Xtest);
+```
+
 ### Concept Graph
 
 ![1](https://github.com/htaiwan/note-andrew-machine-learning/blob/master/Concept%20Graph/Week7/1.png)
