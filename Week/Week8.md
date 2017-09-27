@@ -59,6 +59,196 @@ PCA是用來加速運算，並不是用來處理overfitting的問題。建議先
 * K-Means Algorithm的實作。
 * Principal Component Analysis PCA的實作。
 
+### 作業
+
+#### K-Means Clustering
+
+* Find Closest Centroids
+
+```octave
+% Select an initial set of centroids
+K = 3; % 3 Centroids
+initial_centroids = [3 3; 6 2; 8 5];
+
+% Find the closest centroids for the examples using the initial_centroids
+% idx = m x 1 vector of centroid assignments
+idx = findClosestCentroids(X, initial_centroids); 
+
+============================
+
+% computes the centroid memberships for every example
+function idx = findClosestCentroids(X, centroids)
+
+% Set K
+K = size(centroids, 1);
+
+% You need to return the following variables correctly.
+idx = zeros(size(X,1), 1);
+
+for xi = 1:size(X,1) % for-loop所有的點
+		x = X(xi,:);
+		%找出x的closest centroid
+	    best = Inf;
+	    for ui = 1:K  %分成3個group
+			  u = centroids(ui,:);
+			  distance = dot(x-u, x-u);
+		      if distance < best
+			       best = distance;
+			       idx(xi) = ui; % 替每個點給予分類標籤
+		      end
+	    end
+end
+
+```
+
+* Compute Means
+
+```octave
+%  Compute means based on the closest centroids found in the previous part.
+centroids = computeCentroids(X, idx, K);
+
+============================
+
+% returns the new centroids by computing the means of the data points assigned to each centroid.
+function centroids = computeCentroids(X, idx, K)
+
+% Useful variables
+[m n] = size(X);
+
+% You need to return the following variables correctly.
+centroids = zeros(K, n);
+
+for ui = 1:K
+	centroids(ui,:) = sum(X(find(idx == ui),:)) / sum(idx == ui);
+end
+
+```
+
+* K-Means Clustering
+
+```octave
+% Settings for running K-Means
+K = 3;
+max_iters = 10;
+initial_centroids = kMeansInitCentroids(X, K);
+
+[centroids, idx] = runkMeans(X, initial_centroids, max_iters, true);
+
+============================
+
+% This function initializes K centroids that are to be used in K-Means on the dataset X
+function centroids = kMeansInitCentroids(X, K)
+
+% You should return this values correctly
+centroids = zeros(K, size(X, 2));
+
+% randomly redorder the indices of examples
+randidx = randperm(size(X,1));
+% take the first k examples as centroids
+centroids = X(randidx(1:K),:);
+
+============================
+
+% runs the K-Means algorithm on data matrix X, where each row of X is a single example
+function [centroids, idx] = runkMeans(X, initial_centroids, ...
+                                      max_iters, plot_progress)
+                                      
+% Initialize values
+[m n] = size(X);
+K = size(initial_centroids, 1);
+centroids = initial_centroids;
+previous_centroids = centroids;
+idx = zeros(m, 1);
+
+% Run K-Means
+for i=1:max_iters
+	 % For each example in X, assign it to the closest centroid
+    idx = findClosestCentroids(X, centroids);
+    
+    % Given the memberships, compute new centroids
+    centroids = computeCentroids(X, idx, K);
+end
+```
+
+#### Principle Component Analysis 
+
+* Load Example Dataset
+
+```octave
+%  The following command loads the dataset. You should now have the variable X in your environment
+load ('ex7data1.mat');
+```
+
+* Principal Component Analysis
+
+```octave
+%  Before running PCA, it is important to first normalize X
+[X_norm, mu, sigma] = featureNormalize(X);
+
+%  Run PCA
+[U, S] = pca(X_norm);
+
+============================
+
+% Normalizes the features in X 
+function [X_norm, mu, sigma] = featureNormalize(X)
+
+mu = mean(X);
+X_norm = bsxfun(@minus, X, mu);
+
+sigma = std(X_norm);
+X_norm = bsxfun(@rdivide, X_norm, sigma);
+
+============================
+
+% Run principal component analysis on the dataset X
+function [U, S] = pca(X)
+
+% Useful values
+[m, n] = size(X);
+
+% You need to return the following variables correctly.
+U = zeros(n);
+S = zeros(n);
+
+sigma = (1/m) * X' * X;
+[U, S, V] = svd(sigma);
+
+```
+
+* Dimension Reduction
+
+```octave
+%  Project the data onto K = 1 dimension
+K = 1;
+Z = projectData(X_norm, U, K);
+X_rec  = recoverData(Z, U, K);
+
+============================
+
+% Computes the reduced data representation when projecting only on to the top k eigenvectors
+function Z = projectData(X, U, K)
+
+Z = zeros(size(X, 1), K);
+
+% take the first k directions
+U_reduce = U(:, 1:K);
+% computes the projected data points
+Z = X * U_reduce;
+
+============================
+
+% Recovers an approximation of the original data when using the projected data
+function X_rec = recoverData(Z, U, K)
+
+% You need to return the following variables correctly.
+X_rec = zeros(size(Z, 1), size(U, 1));
+
+U_reduce = U(:, 1:K);
+X_rec = Z * U_reduce';
+
+```
+
 ### Concept Graph
 
 ![1](https://github.com/htaiwan/note-andrew-machine-learning/blob/master/Concept%20Graph/Week8/1.png)
