@@ -64,6 +64,241 @@
 * Anomaly Detection的實作。
 * Recommender Systems的實作。
 
+
+### 作業
+
+#### Anomaly Detection
+
+* Load Example Dataset
+
+```octave
+%  The following command loads the dataset. You should now have the variables X, Xval, yval in your environment
+load('ex8data1.mat');
+
+```
+
+* Estimate the dataset statistics
+
+```octave
+%  Estimate mu and sigma2
+[mu sigma2] = estimateGaussian(X);
+%  Returns the density of the multivariate normal at each data point (row) of X
+p = multivariateGaussian(X, mu, sigma2);
+
+===========================================
+
+% This function estimates the parameters of a Gaussian distribution using the data in X
+function [mu sigma2] = estimateGaussian(X)
+
+% Useful variables
+[m, n] = size(X);
+
+% You should return these values correctly
+mu = zeros(n, 1);
+sigma2 = zeros(n, 1);
+
+mu = mean(X);
+sigma2 = var(X,1);
+
+===========================================
+
+% Computes the probability density function of the multivariate gaussian distribution.
+function p = multivariateGaussian(X, mu, Sigma2)
+
+k = length(mu);
+
+if (size(Sigma2, 2) == 1) || (size(Sigma2, 1) == 1)
+    Sigma2 = diag(Sigma2);
+end
+
+X = bsxfun(@minus, X, mu(:)');
+p = (2 * pi) ^ (- k / 2) * det(Sigma2) ^ (-0.5) * ...
+    exp(-0.5 * sum(bsxfun(@times, X * pinv(Sigma2), X), 2));
+
+end
+```
+
+* Find Outliers
+
+```octave
+pval = multivariateGaussian(Xval, mu, sigma2);
+
+[epsilon F1] = selectThreshold(yval, pval);
+
+===========================================
+
+% Find the best threshold (epsilon) to use for selecting outliers
+function [bestEpsilon bestF1] = selectThreshold(yval, pval)
+
+bestEpsilon = 0;
+bestF1 = 0;
+F1 = 0;
+
+stepsize = (max(pval) - min(pval)) / 1000;
+
+for epsilon = min(pval):stepsize:max(pval)
+	% 若為1，則表示模型判斷異常， 若為0，則表示模型判斷為正常
+	predictions = (pval < epsilon);
+	
+	tp = sum((predictions == 1) & (yval == 1)); % 判斷正確
+	fp = sum((predictions == 1) & (yval == 0)); % 判斷錯誤
+	tn = sum((predictions == 0) & (yval == 0)); % 判斷正確
+	fn = sum((predictions == 0) & (yval == 1)); % 判斷錯誤
+	
+	recall = tp / (tp + fn); % 所有yval == 1時，判斷正確的比例
+	precidion = tp / (tp + fp); % 所有predictions == 1時，判斷正確的比例
+
+	F1 = 2 * precidion * recall / (precidion + recall);
+	
+	if F1 > bestF1
+       bestF1 = F1;
+       bestEpsilon = epsilon;
+    end
+    
+end
+
+```
+
+#### Collaborative Filtering
+
+* Loading movie ratings dataset
+
+```octave
+%  Load data
+load ('ex8_movies.mat');
+
+%  Y is a 1682x943 matrix, containing ratings (1-5) of 1682 movies on 
+%  943 users
+%
+%  R is a 1682x943 matrix, where R(i,j) = 1 if and only if user j gave a
+%  rating to movie i
+
+```
+
+* Collaborative Filtering
+
+```octave
+%  Load pre-trained weights (X, Theta, num_users, num_movies, num_features)
+load ('ex8_movieParams.mat');
+
+%  Reduce the data set size so that this runs faster
+num_users = 4; num_movies = 5; num_features = 3;
+X = X(1:num_movies, 1:num_features);
+Theta = Theta(1:num_users, 1:num_features);
+Y = Y(1:num_movies, 1:num_users);
+R = R(1:num_movies, 1:num_users);
+
+%  Evaluate cost function
+J = cofiCostFunc([X(:) ; Theta(:)], Y, R, num_users, num_movies, ...
+               num_features, 0);
+               
+===========================================
+
+% Collaborative filtering cost function
+function [J, grad] = cofiCostFunc(params, Y, R, num_users, num_movies, ...
+                                  num_features, lambda)
+
+% Unfold the U and W matrices from params
+X = reshape(params(1:num_movies*num_features), num_movies, num_features);
+Theta = reshape(params(num_movies*num_features+1:end), ...
+                num_users, num_features);
+                
+% You need to return the following values correctly
+J = 0;
+X_grad = zeros(size(X));
+Theta_grad = zeros(size(Theta));
+
+% 計算cost function
+predit = X*Theta';
+Cost = (predit-Y).^2;
+J = (1/2)*sum(sum(Cost.*R));
+
+% 計算Gradient
+X_grad = ((predit-Y).*R)*Theta;
+Theta_grad = ((predit-Y).*R)'*X;
+
+% 計算Regularization cost function
+Reg_J = (lambda/2)*sum(sum(Theta.^2))) + ((lambda/2)*sum(sum(X.^2));
+
+% 計算Regularization Gradient
+Reg_X_grad = lambda*X;
+Reg_Theta_grad = lambda*Theta;
+
+% 最終Cost和Gradient
+J = J + Reg_J;
+X_grad = X_grad + Reg_X_grad;
+Theta_grad = Theta_grad + Reg_Theta_grad;
+grad = [X_grad(:); Theta_grad(:)];
+
+```
+
+* Learning Movie Ratings
+
+```octave
+%  Load data
+load('ex8_movies.mat');
+
+%  Y is a 1682x943 matrix, containing ratings (1-5) of 1682 movies by 
+%  943 users
+%
+%  R is a 1682x943 matrix, where R(i,j) = 1 if and only if user j gave a
+%  rating to movie i
+
+%  Add our own ratings to the data matrix
+Y = [my_ratings Y];
+R = [(my_ratings ~= 0) R];
+
+%  Normalize Ratings
+[Ynorm, Ymean] = normalizeRatings(Y, R);
+
+%  Useful Values
+num_users = size(Y, 2);
+num_movies = size(Y, 1);
+num_features = 10;
+
+% Set Initial Parameters (Theta, X)
+X = randn(num_movies, num_features);
+Theta = randn(num_users, num_features);
+
+initial_parameters = [X(:); Theta(:)];
+
+% Set options for fmincg 
+options = optimset('GradObj', 'on', 'MaxIter', 100);
+
+% Set Regularization
+lambda = 10;
+% 利用optimset，找出最佳的X & Theta
+theta = fmincg (@(t)(cofiCostFunc(t, Ynorm, R, num_users, num_movies, ...
+                                num_features, lambda)), ...
+                initial_parameters, options);
+
+% Unfold the returned theta back into U and W 
+% 將算出來的結果，拆成X & Theta 兩塊
+X = reshape(theta(1:num_movies*num_features), num_movies, num_features);
+Theta = reshape(theta(num_movies*num_features+1:end), ...
+                num_users, num_features);
+
+```
+
+* Recommendation for you
+
+```octave
+p = X * Theta';
+my_predictions = p(:,1) + Ymean;
+
+movieList = loadMovieList();
+
+[r, ix] = sort(my_predictions, 'descend');
+
+for i=1:10
+    j = ix(i);
+    fprintf('Predicting rating %.1f for movie %s\n', my_predictions(j), ...
+            movieList{j});
+end
+
+```
+
+
 ### Concept Graph
 
 ![1](https://github.com/htaiwan/note-andrew-machine-learning/blob/master/Concept%20Graph/Week9/1.png)
